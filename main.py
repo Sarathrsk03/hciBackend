@@ -28,7 +28,7 @@ def readStockData(stockSymbol):
 
 @app.get("/stockDetails/{stockName}")
 async def getStockResults(stockName:str,request:Request):
-    data = readStockData(stockName.companyName)
+    data = readStockData(stockName)
     return data 
     pass 
 
