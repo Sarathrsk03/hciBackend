@@ -7,9 +7,6 @@ import io
 
 app = FastAPI() #Initialize FastAPI 
 
-class stockName(BaseModel):
-    companyName:str
-
 
 def readStockData(stockSymbol):
     data = False
@@ -29,9 +26,9 @@ def readStockData(stockSymbol):
 
     
 
-@app.get("/stockDetails")
-async def getStockResults(stockDetails:stockName,request:Request):
-    data = readStockData(stockDetails.companyName)
+@app.get("/stockDetails/{stockName}")
+async def getStockResults(stockName:str,request:Request):
+    data = readStockData(stockName.companyName)
     return data 
     pass 
 
