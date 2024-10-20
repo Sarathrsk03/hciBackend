@@ -1,5 +1,6 @@
-from fastapi import FastAPI,Request,Response
+from fastapi import FastAPI, Request, Response
 from fastapi.responses import HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware  # Add this import
 from yfinance import Ticker
 import yfinance as yf
 from pydantic import BaseModel
@@ -42,8 +43,6 @@ def findStockSymbol(companyName: str):
     except Exception as e:
         return {"dataFound": False, "error": str(e)}
     
-
-
 def getHistoricalPrices(stockSymbol: str, startDate: str, endDate: str):
     """
     Returns historical stock prices for the specified date range.
@@ -81,8 +80,6 @@ def getCurrentPrice(stockSymbol: str):
     except Exception as e:
         return {"dataFound": False, "error": str(e)}
     
-
-
 def readStockData(stockSymbol:str):
     """
         returns data related to that particular stockSymbol
@@ -103,9 +100,17 @@ def readStockData(stockSymbol:str):
 
     return returnData
 
-
-
 app = FastAPI() #Initialize FastAPI 
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
+
 genai.configure(api_key=os.environ["geminiAPI"])
 model = genai.GenerativeModel("gemini-1.5-flash",
                               system_instruction="""You are a finance chatbot, your job is to respond to user's queries only if it relates to finance, if a comapny name is provided by the user, use the companies stock symbol to gain info using the function s
@@ -176,16 +181,10 @@ def transform_history(history):
             new_history.append({"parts": [{"text": chat["content"]}], "role": "model"})
     return new_history
 
-
-
-
-
-
 @app.get("/stockDetails/{stockSymbol}")
 async def getStockResults(stockSymbol: str, request: Request):
     data = readStockData(stockSymbol)
     return data 
-     
 
 @app.get("/stockGraph/{stockSymbol}", response_class=HTMLResponse)
 async def getStockGraph(stockSymbol: str, request: Request):
@@ -210,7 +209,6 @@ async def getStockGraph(stockSymbol: str, request: Request):
 
     # Return the PNG image as a response
     return Response(content=buf.getvalue(), media_type="image/png")
-
 
 @app.post("/chat")
 async def chatbot(request: Request):
