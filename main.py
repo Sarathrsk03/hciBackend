@@ -175,9 +175,9 @@ chat = model.start_chat(history=[],enable_automatic_function_calling=True)
 def transform_history(history):
     new_history = []
     for chat in history:
-        if chat["role"] == "user":
+        if chat["sender"] == "user":
             new_history.append({"parts": [{"text": chat["content"]}], "role": "user"})
-        elif chat["role"] == "bot":
+        elif chat["sender"] == "bot":
             new_history.append({"parts": [{"text": chat["content"]}], "role": "model"})
     return new_history
 
