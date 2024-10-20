@@ -1,11 +1,21 @@
-FROM python:3.9 
+# Use the official Python 3.9 image from Docker Hub
+FROM python:3.9-slim
 
-WORKDIR /code 
+# Set the working directory in the container
+WORKDIR /code
 
-COPY ./requirements.txt /code/requirements.txt 
+# Copy the requirements.txt file first to leverage Docker cache
+COPY ./requirements.txt /code/requirements.txt
 
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+# Install the required Python packages, upgrading pip and setuptools
+RUN pip install --no-cache-dir --upgrade pip setuptools && \
+    pip install --no-cache-dir -r /code/requirements.txt
 
-COPY ./main.py /code/main.py 
+# Copy the rest of the application code
+COPY ./ /code/
 
+# Expose port 8000 (optional, but good practice)
+EXPOSE 8000
+
+# Command to run the FastAPI app using Uvicorn
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
