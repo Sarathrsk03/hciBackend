@@ -42,6 +42,40 @@ def findStockSymbol(companyName: str):
     except Exception as e:
         return {"dataFound": False, "error": str(e)}
     
+def getStockRecommendations(stockSymbol: str):
+    """
+    Returns analyst recommendations for the specified stock.
+    
+    Args:
+        stockSymbol: Stock symbol of the company.
+        
+    Returns:
+        A dictionary containing the recommendations.
+    """
+    try:
+        stock = yf.Ticker(stockSymbol)
+        recommendations = stock.recommendations
+        return {"dataFound": True, "recommendations": recommendations.to_dict(orient='records')}
+    except Exception as e:
+        return {"dataFound": False, "error": str(e)}
+
+
+def getStockNews(stockSymbol: str):
+    """
+    Returns the latest news articles for the specified stock.
+    
+    Args:
+        stockSymbol: Stock symbol of the company.
+        
+    Returns:
+        A dictionary containing news articles.
+    """
+    try:
+        stock = yf.Ticker(stockSymbol)
+        news = stock.news
+        return {"dataFound": True, "news": news}
+    except Exception as e:
+        return {"dataFound": False, "error": str(e)}
 
 
 def getHistoricalPrices(stockSymbol: str, startDate: str, endDate: str):
@@ -74,6 +108,8 @@ def getCurrentPrice(stockSymbol: str):
     Returns:
         A dictionary containing the current price and relevant information.
     """
+
+    print("Hi I work")
     try:
         stock = yf.Ticker(stockSymbol)
         currentPrice = stock.history(period='1d')['Close'].iloc[-1]
@@ -81,6 +117,7 @@ def getCurrentPrice(stockSymbol: str):
     except Exception as e:
         return {"dataFound": False, "error": str(e)}
     
+
 
 
 def readStockData(stockSymbol:str):
@@ -103,6 +140,16 @@ def readStockData(stockSymbol:str):
 
     return returnData
 
+def apple():
+    """
+        If any info about apple is requested by the user
+
+        return: 
+            string 
+
+    """
+
+    return " it works"
 
 
 app = FastAPI() #Initialize FastAPI 
@@ -164,7 +211,8 @@ model = genai.GenerativeModel("gemini-1.5-flash",
     "Chegg, Inc": "CHGG",
 }
 """,
-                              tools=[getHistoricalPrices,getCurrentPrice])
+    
+    tools=[getHistoricalPrices,getCurrentPrice,getStockNews,findStockSymbol,getStockRecommendations,apple])
 chat = model.start_chat(history=[],enable_automatic_function_calling=True)
 
 def transform_history(history):
