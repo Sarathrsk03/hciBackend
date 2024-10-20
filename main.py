@@ -177,7 +177,7 @@ def transform_history(history):
     for chat in history:
         if chat["role"] == "user":
             new_history.append({"parts": [{"text": chat["content"]}], "role": "user"})
-        elif chat["role"] == "assistant":
+        elif chat["role"] == "bot":
             new_history.append({"parts": [{"text": chat["content"]}], "role": "model"})
     return new_history
 
