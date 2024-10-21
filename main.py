@@ -172,13 +172,76 @@ model = genai.GenerativeModel("gemini-1.5-flash",
                               tools=[getHistoricalPrices,getCurrentPrice])
 chat = model.start_chat(history=[],enable_automatic_function_calling=True)
 
+@app.post("/chat")
+async def chatbot(request: Request):
+    try:
+        data = await request.json()
+        message = data["message"]
+        history = data.get("history", [])
+
+        transformed_history = transform_history(history)
+
+        global chat
+        chat.history = transformed_history
+        response = chat.send_message(message)
+
+        # Format the response to match the frontend's expected ApiResponse interface
+        return {
+            "candidates": [{
+                "content": {
+                    "parts": [{
+                        "text": response.text
+                    }],
+                    "role": "model"
+                },
+                "finish_reason": 0,
+                "index": 0,
+                "safety_ratings": [],
+                "token_count": 0,
+                "grounding_attributions": [],
+                "avg_logprobs": 0
+            }],
+            "usage_metadata": {
+                "prompt_token_count": 0,
+                "candidates_token_count": 0,
+                "total_token_count": 0,
+                "cached_content_token_count": 0
+            }
+        }
+    except Exception as e:
+        # Return error in a format that the frontend can handle
+        return {
+            "candidates": [{
+                "content": {
+                    "parts": [{
+                        "text": f"Sorry, I encountered an error: {str(e)}. Please try again."
+                    }],
+                    "role": "model"
+                },
+                "finish_reason": 0,
+                "index": 0,
+                "safety_ratings": [],
+                "token_count": 0,
+                "grounding_attributions": [],
+                "avg_logprobs": 0
+            }],
+            "usage_metadata": {
+                "prompt_token_count": 0,
+                "candidates_token_count": 0,
+                "total_token_count": 0,
+                "cached_content_token_count": 0
+            }
+        }
+
 def transform_history(history):
     new_history = []
     for chat in history:
-        if chat["sender"] == "user":
-            new_history.append({"parts": [{"text": chat["content"]}], "role": "user"})
-        elif chat["sender"] == "bot":
-            new_history.append({"parts": [{"text": chat["content"]}], "role": "model"})
+        if isinstance(chat, dict) and "sender" in chat and "message" in chat:
+            text = chat["message"]
+            if chat["sender"] == "user":
+                new_history.append({"parts": [{"text": text}], "role": "user"})
+            elif chat["sender"] == "bot":
+                new_history.append({"parts": [{"text": text}], "role": "model"})
     return new_history
 
 @app.get("/stockDetails/{stockSymbol}")
