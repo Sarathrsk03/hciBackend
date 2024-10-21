@@ -42,7 +42,78 @@ def findStockSymbol(companyName: str):
             return {"dataFound": False, "message": "No matching stock symbol found."}
     except Exception as e:
         return {"dataFound": False, "error": str(e)}
+        
+def getStockRecommendations(stockSymbol: str):
+    """
+    Returns analyst recommendations for the specified stock.
     
+    Args:
+        stockSymbol: Stock symbol of the company.
+        
+    Returns:
+        A dictionary containing the recommendations.
+    """
+    try:
+        stock = yf.Ticker(stockSymbol)
+        recommendations = stock.recommendations
+        return {"dataFound": True, "recommendations": recommendations.to_dict(orient='records')}
+    except Exception as e:
+        return {"dataFound": False, "error": str(e)}
+def getCompanyFinancials(stockSymbol: str):
+    """
+    Returns the financial statements of the specified company.
+    
+    Args:
+        stockSymbol: Stock symbol of the company.
+        
+    Returns:
+        A dictionary containing income statement, balance sheet, and cash flow statement.
+    """
+    try:
+        stock = yf.Ticker(stockSymbol)
+        financials = {
+            "incomeStatement": stock.financials.to_dict(),
+            "balanceSheet": stock.balance_sheet.to_dict(),
+            "cashFlow": stock.cashflow.to_dict()
+        }
+        return {"dataFound": True, "financials": financials}
+    except Exception as e:
+        return {"dataFound": False, "error": str(e)}
+    
+def getStockDividends(stockSymbol: str):
+    """
+    Returns the dividend history for the specified stock.
+    
+    Args:
+        stockSymbol: Stock symbol of the company.
+        
+    Returns:
+        A dictionary containing dividend data.
+    """
+    try:
+        stock = yf.Ticker(stockSymbol)
+        dividends = stock.dividends
+        return {"dataFound": True, "dividends": dividends.to_dict()}
+    except Exception as e:
+        return {"dataFound": False, "error": str(e)}
+
+def getStockNews(stockSymbol: str):
+    """
+    Returns the latest news articles for the specified stock.
+    
+    Args:
+        stockSymbol: Stock symbol of the company.
+        
+    Returns:
+        A dictionary containing news articles.
+    """
+    try:
+        stock = yf.Ticker(stockSymbol)
+        news = stock.news
+        return {"dataFound": True, "news": news}
+    except Exception as e:
+        return {"dataFound": False, "error": str(e)}
+
 def getHistoricalPrices(stockSymbol: str, startDate: str, endDate: str):
     """
     Returns historical stock prices for the specified date range.
@@ -169,7 +240,7 @@ model = genai.GenerativeModel("gemini-1.5-flash",
     "Chegg, Inc": "CHGG",
 }
 """,
-                              tools=[getHistoricalPrices,getCurrentPrice])
+                              tools=[getHistoricalPrices,getCurrentPrice,getStockNews,getStockDividends,getCompanyFinancials,getStockRecommendations])
 chat = model.start_chat(history=[],enable_automatic_function_calling=True)
 
 @app.post("/chat")
