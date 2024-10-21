@@ -222,4 +222,5 @@ async def chatbot(request: Request):
     global chat
     chat.history = transformed_history  # Update the chat history
     response = chat.send_message(message)
+    print(response.to_dict())
     return response.to_dict()
