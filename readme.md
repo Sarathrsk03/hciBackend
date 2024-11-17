@@ -15,13 +15,10 @@ This project demonstrates integration with Google's Gemini API using Python, con
 project/
 │
 ├── Dockerfile
-├── requirements.txt
-├── .env.example
+├── requirements.tx
 ├── .gitignore
-├── src/
-│   ├── __init__.py
-│   └── main.py
-└── README.md
+│── main.py
+└── readme.md
 ```
 
 ## Environment Setup
@@ -32,16 +29,11 @@ git clone https://github.com/yourusername/project-name.git
 cd project-name
 ```
 
-2. Copy the example environment file and add your Gemini API key:
-```bash
-cp .env.example .env
-```
+2. Create a .env file
 
 3. Update the `.env` file with your credentials:
 ```
-GEMINI_API_KEY=your_api_key_here
-GEMINI_PROJECT_ID=your_project_id
-GEMINI_LOCATION=your_preferred_location # e.g., us-central1
+geminiAPI=your_api_key_here
 ```
 
 ## Local Development
@@ -76,8 +68,7 @@ The following environment variables can be configured:
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
 | GEMINI_API_KEY | Your Gemini API authentication key | Yes | - |
-| GEMINI_PROJECT_ID | Google Cloud project ID | Yes | - |
-| GEMINI_LOCATION | API endpoint location | No | us-central1 |
+
 
 ## Security Notes
 
